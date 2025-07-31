@@ -117,8 +117,25 @@ async def main():
     logging.info(f"Transaction submitted with the hash : {transaction_hash}")
 
 
+    logging.info("\n\n*** 5. Waiting for Transaction Completion ***\n")
+    await rest_client.wait_for_transaction(transaction_hash)
+
+    transaction_details = await rest_client.transaction_by_hash(transaction_hash)
+    success = transaction_details["success"]
+    vm_status = transaction_details["vm_status"]
+    gas_used = transaction_details["gas_used"]
+
+    logging.info(f"Transaction completed with status : {'SUCCESS' if success else 'FAILURE'}")
+    logging.info(f"VM Status : {vm_status}")
+    logging.info(f"Gas used : {gas_used}")
 
 
+    alice_final_balance = await rest_client.account_balance(alice.address())
+    bob_final_balance = await rest_client.account_balance(bob.address())
+
+    logging.info("\n\n*** Final Balances ***\n")
+    logging.info(f"Alice: {alice_final_balance} octas (spent {alice_balance - alice_final_balance} octas on transfer and gas)")
+    logging.info(f"Bob: {bob_final_balance} octas (received 1000 octas)")
 
 
 if __name__ == "__main__":
